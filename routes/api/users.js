@@ -3,7 +3,9 @@ const { check, validationResult } = require('express-validator');
 const router = express.Router();
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../../models/Users');
+const config = require('config');
 const { wait } = require('@testing-library/react');
 
 
@@ -27,10 +29,10 @@ router.post('/', [
     //see if user exists
     let user = await User.findOne({ email });
      if(user){
-         res.status(400).json({ errors: [{msg: 'User already exist'}] });
+         return res.status(400).json({ errors: [{msg: 'User already exist'}] });
      }
-   //Get users gravatar
 
+   //Get users gravatar
    const avatar = gravatar.url(email, {
        s:'200',
        r: 'pg',
@@ -45,8 +47,19 @@ router.post('/', [
    await user.save();
    
    //Return Jsonwebtoken
+   const payload = {
+       user: {
+           id: user.id
+       }
+   }
 
-   res.send('User route')
+   jwt.sign(payload, 
+    config.get('jwtSeceret'),
+    { expiresIn: 360000},
+    (err, token) => {
+        if(err) throw err;
+        res.json({token});
+    });
 
    } catch(err){
        console.error(err.message);
