@@ -34,12 +34,12 @@ router.post('/', [
 
    //Get users gravatar
    const avatar = gravatar.url(email, {
-       s:'200',
-       r: 'pg',
-       d: 'mm'
+       s:'200', //default string size
+       r: 'pg', // rating
+       d: 'mm'  //default
    });
 
-   user = new User({ name, email, password, avatar});
+   user = new User({ name, email, password, avatar}); //not encrypted password
 
    //Encrypt password
    const salt = await bcrypt.genSalt(10);
