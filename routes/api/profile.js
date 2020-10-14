@@ -1,4 +1,6 @@
 const express = require ('express');
+const request = require('request');
+const config = require('config');
 const router = express.Router();
 const auth = require('../../middleware/auth');
 const Profile = require('../../models/Profile');
@@ -206,8 +208,8 @@ router.post('/', [auth, [
     router.put('/education', [auth, [
         check('school', 'school is required').not().isEmpty(),
         check('degree', 'degree is required').not().isEmpty(),
-        check('feildofstudy', 'Fieldofstudy date is required').not().isEmpty(),
-        check('from', 'from is required').not().isEmpty()
+        check('fieldofstudy', 'Fieldofstudy  is required').not().isEmpty(),
+        check('from', 'from date is required').not().isEmpty().custom((value, {req}) => (req.body.to ? value < req.body.to: true))
     ]], async(req, res) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()){
@@ -245,18 +247,49 @@ router.post('/', [auth, [
     router.delete('/education/:edu_id', auth, async (req, res) =>{
         try {
             const profile = await Profile.findOne({ user: req.user.id });
-
-            //Get remove index
-            const removeIndex = profile.education.map(item => item.id).indexOf(req.params.edu_id);
-            profile.education.splice(removeIndex, 1);
-            await profile.save();
-            res.json(profile);
-            
+           // foundProfile.education = foundProfile.education.filter(
+                //(edu) => edu._id-toString() !== req.params.edu_id 
+           // );
+            //await foundProfile.save();
+           // return res.status(200).json(foundProfile); *//
+        // Get remove index
+        const removeIndex = profile.education.map(item => item.id)
+        .indexOf(req.params.edu_id);
+        profile.education.splice(removeIndex, 1);
+        await profile.save();
+        res.json(profile);
         } catch (err) {
             console.error(err.message);
             res.status(500).send('Server error');
         }
 
+    });
+
+    //@route   GET api/profile/gtihub/:username
+    //@desc    Get user repos from github
+    //@acess   Public
+
+    router.get('/github/:username', (req, res) => {
+        try {
+            const options = {
+                uri: 'https://api.gtihub.com/users/${req.params.username}/repos?per_page=5&sort=created:asc&client_id='+ config.get('githubClientId') +' &client_secret='+ config.get('githubSecret'),
+                method: 'GET',
+                headers: {'user-agent' : 'node.js'}
+            };
+
+            request(options, (error, response, body) => {
+                if(error) console.error('print'+ error);
+
+               else if(response.statusCode !== 200){
+                    res.status(404).json({ msg: 'No Github profile found'});
+                }
+                res.json(JSON.parse(body));
+
+        });
+        } catch (err) {
+            console.error(err.message);
+            res.status(500).send('Server error');
+        }
     });
 
 

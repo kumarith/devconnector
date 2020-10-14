@@ -1,4 +1,6 @@
 {
     "mongoURI" : "mongodb+srv://kumari:mongo@123@cluster0.arofd.mongodb.net/devconnector?retryWrites=true&w=majority",
-    "jwtSeceret" : "mySeceret"
+    "jwtSeceret" : "mySeceret",
+    "githubClientId":  "ba7db58279b6be9ce0e5" ,
+    "githubSecret": "5f46e1445799b4464d9f1bc425951df0951a023e"
 }
