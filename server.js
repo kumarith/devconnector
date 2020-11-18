@@ -6,6 +6,7 @@ const app = express();
 
 //connect to Db
 connectDB();
+
 //Init Middleware
 
 app.use(express.json({ extended: false }));
