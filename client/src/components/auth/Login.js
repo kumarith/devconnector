@@ -15,7 +15,7 @@ const Login = ({ login, isAuthenticated }) => {
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const onSubmit = async (e) => {
+  const onSubmit = (e) => {
     e.preventDefault();
     //console.log("SUCCESS");
     login(email, password);
@@ -40,6 +40,7 @@ const Login = ({ login, isAuthenticated }) => {
             name="email"
             value={email}
             onChange={(e) => onChange(e)}
+            required
           />
         </div>
         <div className="form-group">
