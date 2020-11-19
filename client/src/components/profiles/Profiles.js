@@ -40,7 +40,7 @@ Profiles.propTypes = {
   profile: PropTypes.object.isRequired,
 };
 
-const mapStateProps = (state) => ({
+const mapStateToProps = (state) => ({
   profile: state.profile,
 });
-export default connect(mapStateProps, { getProfiles })(Profiles);
+export default connect(mapStateToProps, { getProfiles })(Profiles);

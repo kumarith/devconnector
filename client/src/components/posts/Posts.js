@@ -6,13 +6,12 @@ import PostItem from "./PostItem";
 import PostForm from "./PostForm";
 import { getPosts } from "../../actions/post";
 
-const Posts = ({ getPosts, post: { posts, loading } }) => {
+const Posts = ({ getPosts, post: { posts } }) => {
   useEffect(() => {
     getPosts();
   }, [getPosts]);
-  return loading ? (
-    <Spinner />
-  ) : (
+
+  return (
     <Fragment>
       <h1 className="large text-primary">Posts</h1>
       <p className="lead">

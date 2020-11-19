@@ -1,6 +1,5 @@
 import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
-import { withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { addExperience } from "../../actions/profile";
@@ -15,8 +14,6 @@ const AddExperience = ({ addExperience, history }) => {
     current: false,
     description: "",
   });
-
-  const [toDataDisabled, toggleDisabled] = useState(false);
 
   const { company, title, location, from, to, current, description } = formData;
 
@@ -55,7 +52,6 @@ const AddExperience = ({ addExperience, history }) => {
             name="company"
             value={company}
             onChange={(e) => onChange(e)}
-            required
           />
         </div>
         <div className="form-group">
@@ -65,7 +61,6 @@ const AddExperience = ({ addExperience, history }) => {
             name="location"
             value={location}
             onChange={(e) => onChange(e)}
-            required
           />
         </div>
         <div className="form-group">
@@ -86,7 +81,6 @@ const AddExperience = ({ addExperience, history }) => {
               value={current}
               onChange={(e) => {
                 setFormData({ ...formData, current: !current });
-                toggleDisabled(!toDataDisabled);
               }}
             />
             {""} Current Job
@@ -99,13 +93,8 @@ const AddExperience = ({ addExperience, history }) => {
             name="to"
             value={to}
             onChange={(e) => onChange(e)}
-            disabled={toDataDisabled ? "disabled" : ""}
+            disabled={current}
           />
-        </div>
-        <div className="form-group">
-          <p>
-            <input type="checkbox" name="current" value="" /> Current Job
-          </p>
         </div>
         <div className="form-group">
           <textarea
@@ -129,4 +118,4 @@ const AddExperience = ({ addExperience, history }) => {
 AddExperience.propTypes = {
   addExperience: PropTypes.func.isRequired,
 };
-export default connect(null, { addExperience })(withRouter(AddExperience));
+export default connect(null, { addExperience })(AddExperience);
