@@ -4,8 +4,8 @@ const { check, validationResult } = require("express-validator/check");
 const auth = require("../../middleware/auth");
 
 const Post = require("../../models/Post");
-const Profile = require("../../models/Profile");
 const User = require("../../models/User");
+const checkObjectId = require("../../middleware/checkObjectId");
 
 //@route   POST api/posts
 //@desc    Create a post
@@ -55,7 +55,7 @@ router.get("/", auth, async (req, res) => {
 //@desc    Get  post by ID
 //@acess   Private
 
-router.get("/:id", auth, async (req, res) => {
+router.get("/:id", [auth, checkObjectId("id")], async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post) {
@@ -64,9 +64,6 @@ router.get("/:id", auth, async (req, res) => {
     res.json(post);
   } catch (err) {
     console.error(err.message);
-    if (err.kind === "ObjectId") {
-      return res.status(404).json({ msg: "Post not found" });
-    }
     res.status(500).send("Server error");
   }
 });
@@ -75,7 +72,7 @@ router.get("/:id", auth, async (req, res) => {
 //@desc    Delete post by id
 //@acess   Private
 
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", [auth, checkObjectId("id")], async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
 
@@ -91,9 +88,7 @@ router.delete("/:id", auth, async (req, res) => {
     res.json({ msg: "Post Removed" });
   } catch (err) {
     console.error(err.message);
-    if (err.kind === "ObjectId") {
-      return res.status(404).json({ msg: "Post not found" });
-    }
+
     res.status(500).send("Server error");
   }
 });
@@ -101,20 +96,17 @@ router.delete("/:id", auth, async (req, res) => {
 //@route   PUT api/posts/likes/:id
 //@desc    Like a post
 //@acess   Private
-router.put("/like/:id", auth, async (req, res) => {
+router.put("/like/:id", [auth, checkObjectId("id")], async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
 
     //Check if the post has already been liked
-    if (
-      post.likes.filter((like) => like.user.toString() === req.user.id).length >
-      0
-    ) {
+    if (post.likes.some((like) => like.user.toString() === req.user.id)) {
       return res.status(400).json({ msg: "Post already liked" });
     }
     post.likes.unshift({ user: req.user.id });
     await post.save();
-    res.json(post.likes);
+    return res.json(post.likes);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
@@ -122,17 +114,14 @@ router.put("/like/:id", auth, async (req, res) => {
 });
 
 //@route   PUT api/posts/unlikes/:id
-//@desc    Like a post
+//@desc    Unlike a post
 //@acess   Private
-router.put("/unlike/:id", auth, async (req, res) => {
+router.put("/unlike/:id", [auth, checkObjectId("id")], async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
 
     //Check if the post has already been liked
-    if (
-      post.likes.filter((like) => like.user.toString() === req.user.id)
-        .length === 0
-    ) {
+    if (!post.likes.some((like) => like.user.toString() === req.user.id)) {
       return res.status(400).json({ msg: "Post has not yet been liked" });
     }
 
@@ -142,7 +131,7 @@ router.put("/unlike/:id", auth, async (req, res) => {
     );
 
     await post.save();
-    res.json(post.likes);
+    return res.json(post.likes);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
@@ -155,7 +144,11 @@ router.put("/unlike/:id", auth, async (req, res) => {
 
 router.post(
   "/comment/:id",
-  [auth, [check("text", "Text is required").not().isEmpty()]],
+  [
+    auth,
+    checkObjectId("id"),
+    [check("text", "Text is required").not().isEmpty()],
+  ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -210,7 +203,7 @@ router.delete("/comment/:id/:comment_id", auth, async (req, res) => {
     return res.json(post.comments);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    return res.status(500).send("Server error");
   }
 });
 

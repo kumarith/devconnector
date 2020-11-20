@@ -6,7 +6,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
 const config = require("config");
-const { wait } = require("@testing-library/react");
+const normalize = require("normalize-url");
 
 //@route   Post api/users
 //@desc    Reister user
@@ -39,11 +39,14 @@ router.post(
       }
 
       //Get users gravatar
-      const avatar = gravatar.url(email, {
-        s: "200", //default string size
-        r: "pg", // rating
-        d: "mm", //default
-      });
+      const avatar = normalize(
+        gravatar.url(email, {
+          s: "200", //default string size
+          r: "pg", // rating
+          d: "mm", //default
+        }),
+        { forceHttps: true }
+      );
 
       user = new User({ name, email, password, avatar }); //not encrypted password
 
@@ -62,7 +65,7 @@ router.post(
       jwt.sign(
         payload,
         config.get("jwtSeceret"),
-        { expiresIn: 360000 },
+        { expiresIn: "5 days" },
         (err, token) => {
           if (err) throw err;
           res.json({ token });
