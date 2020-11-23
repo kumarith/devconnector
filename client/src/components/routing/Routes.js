@@ -4,7 +4,7 @@ import Register from "../auth/Register";
 import Login from "../auth/Login";
 import Alert from "../layout/Alert";
 import Dashboard from "../dashboard/Dashboard";
-import ProfileForm from "../profile-forms/ProfileForms";
+import ProfileForm from "../profile-forms/ProfileForm";
 import AddExperience from "../profile-forms/AddExperience";
 import AddEducation from "../profile-forms/AddEducation";
 import Profiles from "../profiles/Profiles";
