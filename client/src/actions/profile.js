@@ -15,7 +15,7 @@ import {
 // Get current users profile
 export const getCurrentProfile = () => async (dispatch) => {
   try {
-    const res = await api.get("/profile/me");
+    const res = await api.get("/profile");
 
     dispatch({
       type: GET_PROFILE,
@@ -33,7 +33,7 @@ export const getCurrentProfile = () => async (dispatch) => {
 export const getProfiles = () => async (dispatch) => {
   dispatch({ type: CLEAR_PROFILE });
   try {
-    const res = await api.get("/profile");
+    const res = await api.get("/profiles");
 
     dispatch({
       type: GET_PROFILES,
@@ -41,8 +41,8 @@ export const getProfiles = () => async (dispatch) => {
     });
   } catch (err) {
     dispatch({
-      type: PROFILE_ERROR,
-      payload: { msg: err.response.statusText, status: err.response.status },
+      type: GET_PROFILES,
+      payload: null,
     });
   }
 };
